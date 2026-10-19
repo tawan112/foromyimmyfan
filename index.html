@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>เซอร์ไพรส์ 💕</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="CSS/style.css">
+</head>
+<body>
+
+  <!-- หัวใจลอยพื้นหลัง (ทุกหน้า) -->
+  <div class="hearts" id="hearts" aria-hidden="true"></div>
+
+  <!-- เพลงพื้นหลัง -->
+  <audio id="bgm" src="media/music.mp3" loop preload="auto"></audio>
+  <button class="music-btn" id="musicBtn" aria-label="เปิด/ปิดเสียงเพลง">🔊</button>
+
+  <!-- หน้า 1 -->
+  <section class="page active" id="page1">
+    <div class="box">
+      <h1>วันนี้วันอะไรน้า? 🤔</h1>
+      <button class="btn" data-next="page2">ไปต่อ</button>
+    </div>
+  </section>
+
+  <!-- หน้า 2 -->
+  <section class="page" id="page2">
+    <div class="box">
+      <h1>เลือกคำตอบเลย!</h1>
+      <div class="answers" id="answers">
+        <button class="answer">วันพุธ 🌲</button>
+        <button class="answer">วันแม่ 🌸</button>
+        <button class="answer">วันวาเลนไทน์ 🌹</button>
+        <button class="answer">วันปีใหม่ 🎆</button>
+        <button class="answer" data-correct="true">วันสำคัญของเรา 💕</button>
+      </div>
+      <p class="feedback" id="feedback"></p>
+      <button class="btn hidden" id="next2" data-next="pageMind">กดเพื่อไปต่อ</button>
+    </div>
+  </section>
+
+  <!-- หน้าใหม่: พิมพ์คำตอบ -->
+  <section class="page" id="pageMind">
+    <div class="box">
+      <h1>วันนี้คือวันอะไรในความคิดของคุณ? 💭</h1>
+      <textarea id="mindText" placeholder="พิมพ์คำตอบของคุณตรงนี้..." maxlength="500"></textarea>
+      <p class="status" id="mindStatus"></p>
+      <button class="btn" id="sendBtn">ส่งคำตอบ</button>
+      <button class="btn hidden" id="nextMind" data-next="page3">กดเพื่อไปต่อ</button>
+    </div>
+  </section>
+
+  <!-- หน้า 3 -->
+  <section class="page" id="page3">
+    <div class="box">
+      <h1>สรุปแล้ววันนี้คือวันอะไรกันนะ?</h1>
+      <button class="btn" data-next="page4" id="reveal">กดที่นี่เพื่อดูเฉลย</button>
+    </div>
+  </section>
+
+  <!-- หน้า 4 -->
+  <section class="page" id="page4">
+    <div class="photos" id="photos"></div>
+    <div class="content">
+      <div class="glass">
+        <p id="typed" aria-live="polite"></p>
+      </div>
+      <div class="glass note" id="note">
+        <p>อมยิ้มเค้าขอบคุณอ้วนนะ ขอบคุณที่ยังอยู่กับคนเเบบเค้า เค้ารู้ที่ผ่านมาเค้าทำไม่ดีเเละทำให้เธอเสียใจมาตลอด เเต่เค้าอยากบอกว่าเค้ารักเธอ เค้าได้เปลี่ยนเเปลงตัวเองเป็นคนที่ดีขึ้นมากๆ เค้าอยากให้เธอเชื่อใจเค้าเค้ารู้ว่ามันยากเเต่เค้ารักเธอมาก เค้าขอบคุณที่เธอสำหรับทุกๆเรื่องที่อ้วนรักเค้ามาตลอด เเละสุดท้ายเค้าขอสัญญาด้วยนิ้วก้อยข้างซ้าย เค้าจะทำให้เธอรู้สึกโชคดีที่มีเค้าและทำให้เธอเป็นผู้หญิงที่โชคดีที่สุดเค้ารักเธอนะ</p>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    const TEXT = "วันที่ 21 ของทุกเดือน เป็นวันครบรอบความรักของ\n❤️ ตะวัน และ อมยิ้ม ❤️";
+
+    // ใส่ลิงก์ฟอร์มจาก Formspree ตรงนี้
+    const FORM_URL = "https://formspree.io/f/xjygzzqv";
+
+    /* ---------- เปลี่ยนหน้า ---------- */
+    function goTo(id) {
+      document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+      document.getElementById(id).classList.add("active");
+      document.body.classList.toggle("final", id === "page4");
+      if (id === "page4") startPage4();
+    }
+    document.querySelectorAll("[data-next]").forEach(btn =>
+      btn.addEventListener("click", () => goTo(btn.dataset.next))
+    );
+
+    /* ---------- หัวใจลอยลงมา ---------- */
+    (function makeHearts() {
+      const wrap = document.getElementById("hearts");
+      const colors = ["#ff8fb1", "#f06292", "#ffb3c7", "#ff6f9c"];
+      for (let i = 0; i < 22; i++) {
+        const h = document.createElement("span");
+        const dur = 9 + Math.random() * 9;
+        h.className = "heart";
+        h.textContent = "♥";
+        h.style.setProperty("--x", Math.random() * 100 + "%");
+        h.style.setProperty("--s", 16 + Math.random() * 26 + "px");
+        h.style.setProperty("--c", colors[i % colors.length]);
+        h.style.setProperty("--d", dur + "s");
+        h.style.setProperty("--delay", -Math.random() * dur + "s");
+        wrap.appendChild(h);
+      }
+    })();
+
+    /* ---------- เพลงพื้นหลัง ---------- */
+    const bgm = document.getElementById("bgm");
+    const musicBtn = document.getElementById("musicBtn");
+    bgm.volume = 0.5;
+
+    // เบราว์เซอร์ต้องมีการกดก่อนถึงเล่นเสียงได้ จึงเริ่มเล่นตอนกดครั้งแรก
+    document.addEventListener("click", () => { bgm.play().catch(() => {}); }, { once: true });
+
+    musicBtn.addEventListener("click", () => {
+      bgm.muted = !bgm.muted;
+      musicBtn.textContent = bgm.muted ? "🔇" : "🔊";
+    });
+
+    /* ---------- หน้า 2: เลือกคำตอบ ---------- */
+    const answersBox = document.getElementById("answers");
+    const feedback = document.getElementById("feedback");
+    const next2 = document.getElementById("next2");
+
+    document.querySelectorAll(".answer").forEach(btn => {
+      btn.addEventListener("click", () => {
+        if (btn.dataset.correct) {
+          btn.classList.add("correct");
+          answersBox.classList.add("locked");
+          feedback.textContent = "ถูกต้อง! 🎉";
+          next2.classList.remove("hidden");
+        } else {
+          btn.classList.add("wrong");
+          answersBox.classList.add("locked");
+          feedback.textContent = "ผิดจ้า ตอบใหม่นะ 😜";
+          setTimeout(() => {
+            btn.classList.remove("wrong");
+            answersBox.classList.remove("locked");
+            feedback.textContent = "";
+          }, 900);
+        }
+      });
+    });
+
+    /* ---------- หน้าใหม่: ส่งคำตอบเข้าเมล ---------- */
+    const mindText = document.getElementById("mindText");
+    const mindStatus = document.getElementById("mindStatus");
+    const sendBtn = document.getElementById("sendBtn");
+    const nextMind = document.getElementById("nextMind");
+
+    sendBtn.addEventListener("click", async () => {
+      const answer = mindText.value.trim();
+      if (!answer) {
+        mindStatus.textContent = "พิมพ์คำตอบก่อนนะ 😊";
+        return;
+      }
+      sendBtn.disabled = true;
+      mindStatus.textContent = "กำลังส่ง...";
+      try {
+        const res = await fetch(FORM_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "Accept": "application/json" },
+          body: JSON.stringify({ subject: "คำตอบวันครบรอบ 💕", message: answer })
+        });
+        if (!res.ok) throw new Error("send failed");
+        mindStatus.textContent = "ส่งคำตอบแล้ว 💌";
+        mindText.disabled = true;
+        sendBtn.classList.add("hidden");
+        nextMind.classList.remove("hidden");
+      } catch (err) {
+        mindStatus.textContent = "ส่งไม่สำเร็จ ลองกดส่งอีกครั้งนะ";
+        sendBtn.disabled = false;
+      }
+    });
+
+    /* ---------- หน้า 4: รูปลอย + พิมพ์ข้อความ ---------- */
+    // ตำแหน่ง x (%), หมุน (องศา), ขนาด (px), หน่วงเวลา (วิ), ความเร็ว (วิ) — จัดแบบกระจัดกระจาย
+    const SCATTER = [
+      { x: 4,  r: -9,  w: 150, delay: 0,   d: 20 },
+      { x: 68, r: 7,   w: 120, delay: 2,   d: 17 },
+      { x: 30, r: -4,  w: 170, delay: 5,   d: 23 },
+      { x: 84, r: 12,  w: 140, delay: 7,   d: 19 },
+      { x: 12, r: 6,   w: 110, delay: 9,   d: 16 },
+      { x: 52, r: -13, w: 130, delay: 11,  d: 21 },
+      { x: 76, r: -5,  w: 160, delay: 13,  d: 24 },
+      { x: 22, r: 10,  w: 125, delay: 15,  d: 18 },
+      { x: 90, r: -8,  w: 105, delay: 3.5, d: 15 },
+      { x: 42, r: 5,   w: 145, delay: 17,  d: 22 },
+      { x: 60, r: 14,  w: 115, delay: 19,  d: 17 },
+      { x: 2,  r: -11, w: 135, delay: 21,  d: 20 }
+    ];
+
+    let started = false;
+    function startPage4() {
+      if (started) return;
+      started = true;
+
+      const wrap = document.getElementById("photos");
+      SCATTER.forEach((s, i) => {
+        const img = document.createElement("img");
+        img.className = "photo";
+        img.src = `media/${i + 1}.jpg`;   // media/1.jpg ... media/12.jpg
+        img.alt = "";
+        img.style.setProperty("--x", s.x + "%");
+        img.style.setProperty("--r", s.r + "deg");
+        img.style.setProperty("--w", s.w + "px");
+        img.style.setProperty("--delay", s.delay + "s");
+        img.style.setProperty("--d", s.d + "s");
+        wrap.appendChild(img);
+      });
+
+      // พิมพ์ทีละตัว (แยกตามตัวอักษรไทยที่รวมสระ/วรรณยุกต์)
+      const chars = window.Intl && Intl.Segmenter
+        ? Array.from(new Intl.Segmenter("th", { granularity: "grapheme" }).segment(TEXT), s => s.segment)
+        : Array.from(TEXT);
+      const el = document.getElementById("typed");
+      let i = 0;
+      setTimeout(function tick() {
+        if (i < chars.length) {
+          el.textContent += chars[i++];
+          setTimeout(tick, 110);
+        } else {
+          document.getElementById("note").classList.add("show");
+        }
+      }, 800);
+    }
+  </script>
+</body>
+</html>

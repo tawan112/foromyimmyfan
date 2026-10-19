@@ -1,0 +1,249 @@
+:root {
+  --pink-soft: #ffe3ec;
+  --pink-edge: #f7b6ca;
+  --pink-deep: #d6537c;
+  --ink: #5a2a3c;
+  --red: #ef4b4b;
+  --green: #3fb86b;
+  --white: #ffffff;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body { height: 100%; }
+
+body {
+  font-family: "Mali", "Itim", "Sarabun", "Noto Sans Thai", sans-serif;
+  color: var(--ink);
+  background: var(--white);
+  overflow: hidden;
+}
+
+.page {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .6s ease, visibility .6s;
+  background: transparent;
+}
+.page.active { opacity: 1; visibility: visible; }
+
+.box {
+  width: min(520px, 100%);
+  background: var(--pink-soft);
+  border: 2px solid var(--pink-edge);
+  border-radius: 28px;
+  padding: 40px 32px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(214, 83, 124, .15);
+}
+
+.box h1 {
+  font-size: clamp(1.6rem, 5vw, 2.1rem);
+  line-height: 1.4;
+  margin-bottom: 28px;
+}
+
+.btn {
+  font: inherit;
+  font-size: 1.1rem;
+  color: var(--white);
+  background: var(--pink-deep);
+  border: none;
+  border-radius: 999px;
+  padding: 12px 34px;
+  cursor: pointer;
+  transition: transform .15s ease, background .2s ease;
+}
+.btn:hover { transform: scale(1.05); }
+.btn:focus-visible, .answer:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+.btn.hidden { display: none; }
+
+/* ---------- page 2 ---------- */
+.answers { display: grid; gap: 12px; margin-bottom: 22px; }
+
+.answer {
+  font: inherit;
+  font-size: 1.05rem;
+  color: var(--ink);
+  background: var(--white);
+  border: 2px solid var(--pink-edge);
+  border-radius: 16px;
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: background .25s ease, border-color .25s ease, color .25s ease;
+}
+.answer.wrong {
+  background: var(--red);
+  border-color: var(--red);
+  color: var(--white);
+  animation: shake .4s;
+}
+.answer.correct {
+  background: var(--green);
+  border-color: var(--green);
+  color: var(--white);
+}
+.answers.locked .answer { pointer-events: none; }
+
+.feedback { min-height: 1.6em; margin-bottom: 14px; font-size: 1.05rem; }
+
+@keyframes shake {
+  25% { transform: translateX(-8px); }
+  75% { transform: translateX(8px); }
+}
+
+/* ---------- page 4 ---------- */
+#page4 {
+  overflow: hidden;
+}
+
+.photos { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+
+.photo {
+  position: absolute;
+  top: 100%;
+  width: var(--w, 150px);
+  aspect-ratio: 3 / 4;
+  left: var(--x);
+  transform: rotate(var(--r));
+  border: 6px solid var(--white);
+  border-radius: 6px;
+  background: linear-gradient(135deg, var(--pink-edge), var(--pink-soft));
+  box-shadow: 0 8px 20px rgba(90, 42, 60, .25);
+  object-fit: cover;
+  animation: floatUp var(--d, 18s) linear var(--delay, 0s) infinite;
+}
+
+@keyframes floatUp {
+  from { top: 105%; }
+  to   { top: -45%; }
+}
+
+.content {
+  position: relative;
+  z-index: 2;
+  width: min(640px, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.glass {
+  width: 100%;
+  padding: 44px 32px;
+  text-align: center;
+  background: rgba(255, 255, 255, .35);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, .6);
+  border-radius: 28px;
+}
+
+#typed {
+  font-size: clamp(1.4rem, 4.6vw, 2.2rem);
+  line-height: 1.7;
+  min-height: 5.2em;
+  white-space: pre-line;
+  text-shadow: 0 1px 8px rgba(255, 255, 255, .8);
+}
+#typed::after {
+  content: "";
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  margin-left: 4px;
+  vertical-align: -0.1em;
+  background: var(--ink);
+  animation: blink 1s steps(1) infinite;
+}
+
+/* กล่องความในใจ */
+.note {
+  padding: 24px 28px;
+  font-size: clamp(1rem, 3.4vw, 1.25rem);
+  line-height: 1.8;
+  white-space: pre-line;
+  opacity: 0;
+  transition: opacity 1.2s ease;
+}
+.note.show { opacity: 1; }
+
+@keyframes blink { 50% { opacity: 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .photo { animation-duration: 60s; }
+  .answer.wrong { animation: none; }
+}
+
+/* ---------- พื้นหลังหน้าสุดท้าย ---------- */
+body.final {
+  background: linear-gradient(160deg, #ffeef4, #ffd6e4 60%, #ffc7da);
+}
+
+/* ---------- หัวใจลอย ---------- */
+.hearts {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+.heart {
+  position: absolute;
+  top: 0;
+  left: var(--x);
+  font-size: var(--s);
+  color: var(--c);
+  opacity: .7;
+  animation: fall var(--d) linear var(--delay) infinite;
+}
+@keyframes fall {
+  0%   { transform: translate(0, -10vh) rotate(-10deg); }
+  50%  { transform: translate(22px, 55vh) rotate(10deg); }
+  100% { transform: translate(0, 115vh) rotate(-10deg); }
+}
+
+/* ---------- ปุ่มเพลง ---------- */
+.music-btn {
+  position: fixed;
+  top: 14px;
+  right: 14px;
+  z-index: 10;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px solid var(--pink-edge);
+  background: rgba(255, 255, 255, .8);
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+/* ---------- หน้าพิมพ์คำตอบ ---------- */
+.box textarea {
+  width: 100%;
+  min-height: 110px;
+  font: inherit;
+  font-size: 1.05rem;
+  color: var(--ink);
+  background: var(--white);
+  border: 2px solid var(--pink-edge);
+  border-radius: 16px;
+  padding: 14px 16px;
+  resize: none;
+  margin-bottom: 14px;
+}
+.box textarea:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+
+.status { min-height: 1.6em; margin-bottom: 14px; font-size: 1.05rem; }
+
+.btn:disabled { opacity: .6; cursor: default; transform: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .heart { animation-duration: 40s; }
+}
