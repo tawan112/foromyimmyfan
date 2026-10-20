@@ -49,7 +49,38 @@
       <textarea id="mindText" placeholder="พิมพ์คำตอบของคุณตรงนี้..." maxlength="500"></textarea>
       <p class="status" id="mindStatus"></p>
       <button class="btn" id="sendBtn">ส่งคำตอบ</button>
-      <button class="btn hidden" id="nextMind" data-next="page3">กดเพื่อไปต่อ</button>
+      <button class="btn hidden" id="nextMind" data-next="pageMind2">กดเพื่อไปต่อ</button>
+    </div>
+  </section>
+
+  <!-- หน้าใหม่ 2: พิมพ์คำตอบ (ความรักตอนนี้) -->
+  <section class="page" id="pageMind2">
+    <div class="box">
+      <h1>ความรักตอนนี้ของคุณเป็นอย่างไร? 💗</h1>
+      <textarea id="loveText" placeholder="พิมพ์คำตอบของคุณตรงนี้..." maxlength="500"></textarea>
+      <p class="status" id="loveStatus"></p>
+      <button class="btn" id="loveSend">ส่งคำตอบ</button>
+      <button class="btn hidden" id="loveNext" data-next="pageAsk">กดเพื่อไปต่อ</button>
+    </div>
+  </section>
+
+  <!-- หน้าใหม่ 3: คำถาม -->
+  <section class="page" id="pageAsk">
+    <div class="box">
+      <h1>คุณยังอยากมีความรักครั้งนี้ต่อไปมั้ย? 🥺</h1>
+      <textarea id="askText" placeholder="พิมพ์คำตอบของคุณตรงนี้..." maxlength="500"></textarea>
+      <p class="status" id="askStatus"></p>
+      <button class="btn" id="askSend">ส่งคำตอบ</button>
+      <button class="btn hidden" id="askNext" data-next="pageRoad">กดเพื่อไปต่อ</button>
+    </div>
+  </section>
+
+  <!-- หน้าใหม่ 4: Road map -->
+  <section class="page" id="pageRoad">
+    <div class="road-box" id="roadBox">
+      <h1>เส้นทางของเรา 🛤️</h1>
+      <div id="roadList"></div>
+      <button class="btn hidden" id="roadNext" data-next="page3">กดเพื่อไปต่อ</button>
     </div>
   </section>
 
@@ -85,6 +116,7 @@
       document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
       document.getElementById(id).classList.add("active");
       document.body.classList.toggle("final", id === "page4");
+      if (id === "pageRoad") startRoad();
       if (id === "page4") startPage4();
     }
     document.querySelectorAll("[data-next]").forEach(btn =>
@@ -147,36 +179,114 @@
       });
     });
 
-    /* ---------- หน้าใหม่: ส่งคำตอบเข้าเมล ---------- */
-    const mindText = document.getElementById("mindText");
-    const mindStatus = document.getElementById("mindStatus");
-    const sendBtn = document.getElementById("sendBtn");
-    const nextMind = document.getElementById("nextMind");
+    /* ---------- หน้าพิมพ์คำตอบ: ส่งเข้าเมล ---------- */
+    function setupSend({ text, status, send, next, question }) {
+      const textEl = document.getElementById(text);
+      const statusEl = document.getElementById(status);
+      const sendEl = document.getElementById(send);
+      const nextEl = document.getElementById(next);
 
-    sendBtn.addEventListener("click", async () => {
-      const answer = mindText.value.trim();
-      if (!answer) {
-        mindStatus.textContent = "พิมพ์คำตอบก่อนนะ 😊";
-        return;
-      }
-      sendBtn.disabled = true;
-      mindStatus.textContent = "กำลังส่ง...";
-      try {
-        const res = await fetch(FORM_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json", "Accept": "application/json" },
-          body: JSON.stringify({ subject: "คำตอบวันครบรอบ 💕", message: answer })
-        });
-        if (!res.ok) throw new Error("send failed");
-        mindStatus.textContent = "ส่งคำตอบแล้ว 💌";
-        mindText.disabled = true;
-        sendBtn.classList.add("hidden");
-        nextMind.classList.remove("hidden");
-      } catch (err) {
-        mindStatus.textContent = "ส่งไม่สำเร็จ ลองกดส่งอีกครั้งนะ";
-        sendBtn.disabled = false;
-      }
+      sendEl.addEventListener("click", async () => {
+        const answer = textEl.value.trim();
+        if (!answer) {
+          statusEl.textContent = "พิมพ์คำตอบก่อนนะ 😊";
+          return;
+        }
+        sendEl.disabled = true;
+        statusEl.textContent = "กำลังส่ง...";
+        try {
+          const res = await fetch(FORM_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "Accept": "application/json" },
+            body: JSON.stringify({
+              subject: "คำตอบวันครบรอบ 💕",
+              question: question,
+              message: answer
+            })
+          });
+          if (!res.ok) throw new Error("send failed");
+          statusEl.textContent = "ส่งคำตอบแล้ว 💌";
+          textEl.disabled = true;
+          sendEl.classList.add("hidden");
+          nextEl.classList.remove("hidden");
+        } catch (err) {
+          statusEl.textContent = "ส่งไม่สำเร็จ ลองกดส่งอีกครั้งนะ";
+          sendEl.disabled = false;
+        }
+      });
+    }
+
+    setupSend({
+      text: "mindText", status: "mindStatus", send: "sendBtn", next: "nextMind",
+      question: "วันนี้คือวันอะไรในความคิดของคุณ?"
     });
+    setupSend({
+      text: "loveText", status: "loveStatus", send: "loveSend", next: "loveNext",
+      question: "ความรักตอนนี้ของคุณเป็นอย่างไร?"
+    });
+
+    setupSend({
+      text: "askText", status: "askStatus", send: "askSend", next: "askNext",
+      question: "คุณยังอยากมีความรักครั้งนี้ต่อไปมั้ย?"
+    });
+
+    /* ---------- Road map ---------- */
+    const STOPS = [
+      { date: "6 กรกฎาคม 2569",   text: "วันนี้คือวันที่เราได้เมคเฟรนกันครั้งเเรก" },
+      { date: "8 กรกฎาคม 2569",   text: "วันนี้คือวันที่เราได้ไปเจอกันครั้งเเรก" },
+      { date: "16 กรกฎาคม 2569",  text: "วันนี้คือวันเกิดครบรอบ 21 ปีของเธอ" },
+      { date: "8 สิงหาคม 2569",   text: "วันนี้คือวันที่เราได้กลับมาคุยกันครั้งเเรกหลังจากเลิกคุยกันไป" },
+      { date: "21 สิงหาคม 2569",  text: "วันนี้คือวันที่เราได้คบหากันเป็นเเฟน" },
+      { date: "21 กันยายน 2569",  text: "วันนี้คือวันที่เราคบกันมาได้ 1 เดือนถึงเเม้จะมีอุปสรรคมากมายเเต่ก็ผ่านไปได้" },
+      { date: "21 ตุลาคม 2569",   text: "?????" }
+    ];
+
+    const sleep = ms => new Promise(r => setTimeout(r, ms));
+    const splitChars = t => (window.Intl && Intl.Segmenter)
+      ? Array.from(new Intl.Segmenter("th", { granularity: "grapheme" }).segment(t), x => x.segment)
+      : Array.from(t);
+
+    let roadStarted = false;
+    async function startRoad() {
+      if (roadStarted) return;
+      roadStarted = true;
+
+      const box = document.getElementById("roadBox");
+      const list = document.getElementById("roadList");
+      const scrollDown = () => box.scrollTo({ top: box.scrollHeight, behavior: "smooth" });
+
+      await sleep(700);
+      for (let i = 0; i < STOPS.length; i++) {
+        const stop = document.createElement("div");
+        stop.className = "stop";
+        stop.innerHTML = '<div class="dot"></div><div class="stop-date"></div><p class="stop-desc"></p>';
+        stop.querySelector(".stop-date").textContent = STOPS[i].date;
+        list.appendChild(stop);
+        void stop.offsetWidth;
+        stop.classList.add("show");
+        scrollDown();
+        await sleep(700);
+
+        const desc = stop.querySelector(".stop-desc");
+        for (const ch of splitChars(STOPS[i].text)) {
+          desc.textContent += ch;
+          await sleep(70);
+        }
+        await sleep(600);
+
+        if (i < STOPS.length - 1) {
+          const dash = document.createElement("div");
+          dash.className = "dash";
+          list.appendChild(dash);
+          void dash.offsetWidth;
+          dash.classList.add("go");
+          scrollDown();
+          await sleep(1300);
+        }
+      }
+      document.getElementById("roadNext").classList.remove("hidden");
+      scrollDown();
+    }
 
     /* ---------- หน้า 4: รูปลอย + พิมพ์ข้อความ ---------- */
     // ตำแหน่ง x (%), หมุน (องศา), ขนาด (px), หน่วงเวลา (วิ), ความเร็ว (วิ) — จัดแบบกระจัดกระจาย
